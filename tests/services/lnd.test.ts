@@ -1,5 +1,9 @@
 import { LndService } from '@services/lnd';
 
+const mockCall = {
+  on: jest.fn().mockReturnThis(),
+};
+
 const lndGrcpMock = {
   state: 'active',
   connect: jest.fn(async () => {
@@ -11,7 +15,7 @@ const lndGrcpMock = {
   }),
   services: {
     Lightning: {
-      subscribeInvoices: jest.fn(),
+      subscribeInvoices: jest.fn().mockReturnValue(mockCall),
       addInvoice: jest.fn(),
     },
     Router: {
@@ -69,7 +73,7 @@ describe('lnd service', () => {
   });
   it('should pay an invoice', async () => {
     lndGrcpMock.services.Router.sendPaymentV2.mockReturnValue({
-      on: jest.fn((event, callback) => {
+      on: jest.fn((_event, callback) => {
         callback({ status: 'SUCCEEDED' });
       }),
     });
@@ -82,7 +86,7 @@ describe('lnd service', () => {
   });
   it('should reject on failed payment', async () => {
     lndGrcpMock.services.Router.sendPaymentV2.mockReturnValue({
-      on: jest.fn((event, callback) => {
+      on: jest.fn((_event, callback) => {
         callback({ status: 'FAILED', failure_reason: 'FAILURE_REASON_ERROR' });
       }),
     });
