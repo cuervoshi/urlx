@@ -30,6 +30,9 @@ FROM base AS runner
 WORKDIR /app
 COPY --from=build --chown=nodejs:nodejs /app/dist ./dist
 COPY --from=build /app/node_modules ./node_modules
+
+RUN chown -R nodejs:nodejs /app && chmod -R u+rwX,g+rwX,o+rX /app
+
 USER nodejs
 ENV NODE_ENV production
 ENV PORT     3000
